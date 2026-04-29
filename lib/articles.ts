@@ -32,7 +32,7 @@ const categoryDefs: Omit<Category, 'count'>[] = [
 export const articles: Article[] = [
   {
     slug: 'best-credit-cards-uk-2026',
-    title: 'Best Credit Cards UK 2026 — 0% Interest, Cashback and Rewards Compared',
+    title: 'Best Credit Cards UK 2026 — 0% Interest, Cashback and Rewards',
     excerpt:
       'We analysed 40+ UK credit cards across cashback, travel rewards, 0% purchase periods and credit building to find the best options for every wallet type in 2026.',
     category: 'credit-cards',
