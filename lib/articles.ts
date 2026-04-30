@@ -31,7 +31,7 @@ const categoryDefs: Omit<Category, 'count'>[] = [
 
 export const articles: Article[] = [
   {
-    slug: 'best-credit-cards-uk-2026',
+    slug: 'best-credit-cards-uk',
     title: 'Best Credit Cards UK 2026 — 0% Interest',
     excerpt:
       'We analysed 40+ UK credit cards across cashback, travel rewards, 0% purchase periods and credit building to find the best options for every wallet type in 2026.',
@@ -92,7 +92,7 @@ If you pay off your balance monthly, a rewards or cashback card gives you free m
   },
 
   {
-    slug: 'best-cashback-credit-cards-uk-2026',
+    slug: 'best-cashback-credit-cards-uk',
     title: 'Best Cashback Credit Cards UK 2026 — Earn Money on Every Purchase',
     excerpt:
       'The right cashback credit card can put hundreds of pounds back in your pocket every year. We compare every major cashback card in the UK to find the best deals.',
@@ -183,7 +183,7 @@ Most people see meaningful improvement within 12 to 18 months of responsible use
   },
 
   {
-    slug: 'best-travel-credit-cards-uk-2026',
+    slug: 'best-travel-credit-cards-uk',
     title: 'Best Travel Credit Cards UK 2026 — No Foreign Fees and Rewards',
     excerpt:
       'Using the wrong card abroad can cost you 3% on every transaction. These travel credit cards offer zero foreign transaction fees and earn rewards on every trip.',
@@ -228,7 +228,7 @@ No foreign fees, no annual fee, Mastercard acceptance worldwide. No rewards, but
   },
 
   {
-    slug: 'best-student-loans-uk-2026',
+    slug: 'best-student-loans-uk',
     title: 'Best Student Loans UK 2026 — Plan 2 vs Plan 5, Repayment and What You Actually Owe',
     excerpt:
       'Everything UK students need to know about student loans in 2026 — repayment thresholds, interest rates, and whether paying it off early ever makes sense.',
@@ -415,7 +415,7 @@ Even £50 per month added to your initial £500, at a 7% average annual return, 
   },
 
   {
-    slug: 'best-stocks-shares-isa-uk-2026',
+    slug: 'best-stocks-shares-isa-uk',
     title: 'Best Stocks and Shares ISA UK 2026 — Platforms Compared for Every Budget',
     excerpt:
       'A Stocks and Shares ISA is the most tax-efficient way to invest in the UK. We compare every major platform on fees, fund range and ease of use to find the best for you.',
@@ -785,7 +785,7 @@ Pay minimums on all debts, then put every extra pound towards the smallest balan
   },
 
   {
-    slug: 'best-savings-accounts-uk-5-percent-2026',
+    slug: 'best-savings-accounts-uk-5-percent',
     title: 'Best Easy-Access Savings Accounts with Rates Above 5% in 2026',
     excerpt:
       'Interest rates are still high. We round up the best easy-access savings accounts paying above 5% so your cash works as hard as possible while remaining accessible.',
@@ -813,7 +813,7 @@ Pay minimums on all debts, then put every extra pound towards the smallest balan
   },
 
   {
-    slug: 'lifetime-isa-guide-uk-2026',
+    slug: 'lifetime-isa-guide-uk',
     title: 'Lifetime ISA UK Guide 2026 — The 25% Government Bonus Explained',
     excerpt:
       'The Lifetime ISA is one of the best financial products available to under-40s. A 25% government bonus on every pound you save is too good to ignore.',
@@ -874,7 +874,7 @@ With £10,000 initial investment and £500 per month contributions:
   },
 
   {
-    slug: 'best-junior-isa-uk-2026',
+    slug: 'best-junior-isa-uk',
     title: 'Best Junior ISA UK 2026 — Save Tax-Free for Your Child Future',
     excerpt:
       'A Junior ISA is one of the most powerful ways to build wealth for your child. We compare the best cash and stocks and shares junior ISAs available in 2026.',
@@ -904,7 +904,7 @@ A Junior ISA is a tax-free savings account for children under 18. With a £9,000
   },
 
   {
-    slug: 'best-rewards-credit-cards-uk-2026',
+    slug: 'best-rewards-credit-cards-uk',
     title: 'Best Rewards Credit Cards UK 2026',
     excerpt:
       'Earn points, miles and cashback on every purchase. We compare the top rewards credit cards in the UK for maximum value from everyday spending.',
@@ -962,7 +962,7 @@ Every full credit card application leaves a hard search on your credit file. Sof
   },
 
   {
-    slug: 'how-to-improve-credit-score-uk-2026',
+    slug: 'how-to-improve-credit-score-uk',
     title: 'How to Improve Your Credit Score UK 2026',
     excerpt:
       'A better credit score unlocks better interest rates, higher credit limits and easier mortgage approvals. These proven steps raise your score faster than most people expect.',
@@ -1028,7 +1028,7 @@ Every full credit card application leaves a hard search on your credit file. Sof
   },
 
   {
-    slug: 'postgraduate-loan-uk-guide-2026',
+    slug: 'postgraduate-loan-uk-guide',
     title: 'Postgraduate Loan UK 2026 — Masters and PhD Funding',
     excerpt:
       'The Postgraduate Masters Loan offers up to £13,348 and the Doctoral Loan up to £29,390. Here is everything you need to know about eligibility, repayment and whether it is worth taking.',
@@ -1159,7 +1159,7 @@ Your own income does not affect your maintenance loan entitlement. 15 hours per 
   },
 
   {
-    slug: 'dividend-investing-uk-guide-2026',
+    slug: 'dividend-investing-uk-guide',
     title: 'Dividend Investing UK — Build Passive Income in 2026',
     excerpt:
       'Dividend investing means building a portfolio that pays you regular income. Here is how to find reliable dividend stocks and funds.',
@@ -1189,7 +1189,7 @@ Dividends inside a Stocks and Shares ISA are completely tax-free. This is the mo
   },
 
   {
-    slug: 'how-to-open-sipp-uk-2026',
+    slug: 'how-to-open-sipp-uk',
     title: 'How to Open a SIPP UK 2026 — Self-Invested Pension Guide',
     excerpt:
       'A SIPP gives you full control over where your retirement money is invested, plus powerful government tax relief.',
@@ -1217,7 +1217,7 @@ Dividends inside a Stocks and Shares ISA are completely tax-free. This is the mo
   },
 
   {
-    slug: 'robo-advisors-uk-2026-compared',
+    slug: 'robo-advisors-uk-compared',
     title: 'Best Robo-Advisors UK 2026 — Hands-Off Investing Compared',
     excerpt:
       'Robo-advisors manage your investments automatically based on your risk profile. We compare every major UK robo-advisor on fees, features and suitability.',
@@ -1275,7 +1275,7 @@ Most lenders offer between 4 and 4.5 times your annual gross income.
   },
 
   {
-    slug: 'buy-to-let-mortgage-uk-guide-2026',
+    slug: 'buy-to-let-mortgage-uk-guide',
     title: 'Buy-to-Let Mortgage UK 2026 — Is It Still Worth It?',
     excerpt:
       'Buy-to-let can generate rental income and capital growth, but tax changes and higher deposit requirements have made the maths much harder.',
@@ -1329,7 +1329,7 @@ On a £200,000 mortgage at 4.5% over 25 years:
   },
 
   {
-    slug: 'shared-ownership-uk-guide-2026',
+    slug: 'shared-ownership-uk-guide',
     title: 'Shared Ownership UK 2026 — How It Works and Is It Worth It?',
     excerpt:
       'Shared Ownership lets you buy a percentage of a property and pay rent on the rest. The real costs and restrictions are widely misunderstood.',
@@ -1377,7 +1377,7 @@ Zero-based budgeting assigns every single pound of your income to a specific cat
   },
 
   {
-    slug: 'sinking-funds-uk-guide-2026',
+    slug: 'sinking-funds-uk-guide',
     title: 'Sinking Funds UK 2026 — Never Be Caught Out By a Big Bill',
     excerpt:
       'A sinking fund is money set aside each month for a known future expense. Used correctly, sinking funds eliminate financial surprises.',
@@ -1432,7 +1432,7 @@ Zero-based budgeting assigns every single pound of your income to a specific cat
   },
 
   {
-    slug: 'frugal-living-uk-tips-2026',
+    slug: 'frugal-living-uk-tips',
     title: 'Frugal Living UK 2026 — 30 Ways to Cut Costs Without Feeling Deprived',
     excerpt:
       'Frugal living is about getting maximum value from every pound. These 30 practical UK money-saving tips reduce outgoings without reducing quality of life.',
@@ -1451,7 +1451,7 @@ Zero-based budgeting assigns every single pound of your income to a specific cat
   },
 
   {
-    slug: 'best-fixed-rate-bonds-uk-2026',
+    slug: 'best-fixed-rate-bonds-uk',
     title: 'Best Fixed-Rate Bonds UK 2026 — Lock In High Returns',
     excerpt:
       'Fixed-rate bonds pay higher interest than easy-access accounts in exchange for locking money away for a set period. We compare the best rates available right now.',
@@ -1502,7 +1502,7 @@ Save up to £50 per month. After two years, the government adds 50% of your high
   },
 
   {
-    slug: 'regular-savings-accounts-uk-2026',
+    slug: 'regular-savings-accounts-uk',
     title: 'Best Regular Savings Accounts UK 2026 — Up to 7% AER',
     excerpt:
       'Regular savings accounts pay far higher rates than standard savings — some above 7% AER — in exchange for saving a set amount each month.',
@@ -1530,7 +1530,7 @@ Save up to £50 per month. After two years, the government adds 50% of your high
   },
 
   {
-    slug: 'premium-bonds-uk-guide-2026',
+    slug: 'premium-bonds-uk-guide',
     title: 'Premium Bonds UK 2026 — Are They Worth It?',
     excerpt:
       'Premium Bonds are held by 22 million UK savers. But are they actually a good place for your money?',
@@ -1557,7 +1557,7 @@ NS&I's prize fund rate in April 2026 is 4.4%.
   // ─── CREDIT CARDS — 2 new articles ───────────────────────────────────────
 
   {
-    slug: 'balance-transfer-credit-cards-uk-2026',
+    slug: 'balance-transfer-credit-cards-uk',
     title: 'Best Balance Transfer Credit Cards UK 2026 — Clear Debt Interest-Free',
     excerpt:
       'A balance transfer card moves expensive debt to a 0% deal, giving you months or years to pay it off without accruing a penny in interest. We compare every top deal in the UK right now.',
@@ -1737,7 +1737,7 @@ Credit cards are excellent financial tools when you control them. When they cont
   // ─── STUDENT LOANS — 2 new articles ─────────────────────────────────────
 
   {
-    slug: 'student-overdraft-uk-guide-2026',
+    slug: 'student-overdraft-uk-guide',
     title: 'Student Overdrafts UK 2026 — How to Use a 0% Overdraft Without the Debt Trap',
     excerpt:
       'A student bank account with a 0% overdraft is one of the most valuable financial tools available to UK students — but only if you understand how it works and what happens after graduation.',
@@ -1920,7 +1920,7 @@ Log in to the Student Loans Company portal and check your current outstanding ba
   // ─── INVESTING — 2 new articles ───────────────────────────────────────────
 
   {
-    slug: 'how-to-invest-in-property-uk-2026',
+    slug: 'how-to-invest-in-property-uk',
     title: 'How to Invest in Property UK 2026 — REITs, Buy-to-Let and Crowdfunding Compared',
     excerpt:
       'Property is the UK\'s favourite investment — but you do not need a large deposit or a mortgage to get exposure. We compare every way to invest in UK property in 2026.',
@@ -2201,7 +2201,7 @@ Before proceeding, ask: "Are you whole-of-market, and do you have access to all 
   },
 
   {
-    slug: 'stamp-duty-guide-uk-2026',
+    slug: 'stamp-duty-guide-uk',
     title: 'Stamp Duty UK 2026 — Rates, First-Time Buyer Relief and How to Calculate Your Bill',
     excerpt:
       'Stamp duty is often the second largest upfront cost of buying a home. This guide explains exactly how much you will pay, the reliefs available, and the surcharges that catch buyers out.',
@@ -2477,7 +2477,7 @@ Used together, they represent a complete money management framework: automated s
   // ─── SAVINGS — 2 new articles ────────────────────────────────────────────
 
   {
-    slug: 'notice-accounts-uk-2026',
+    slug: 'notice-accounts-uk',
     title: 'Best Notice Savings Accounts UK 2026 — Higher Rates for Patient Savers',
     excerpt:
       'Notice accounts pay more than instant access accounts in exchange for a short waiting period. For savers who do not need immediate access, they are one of the best deals in the current market.',
@@ -2556,7 +2556,7 @@ At current rates of around 5%, you would need approximately £20,000 in savings 
   },
 
   {
-    slug: 'cash-isa-allowance-uk-guide-2026',
+    slug: 'cash-isa-allowance-uk-guide',
     title: 'Cash ISA Allowance UK 2026 — Rules, Limits and How to Make the Most of It',
     excerpt:
       'The £20,000 Cash ISA allowance resets every April. Understanding the rules — including transfers, flexible ISAs and multiple accounts — can make a meaningful difference to your long-term tax-free savings.',
