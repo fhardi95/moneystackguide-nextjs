@@ -34,7 +34,7 @@ export default function HomePage() {
         {/* H1 — most important on-page heading */}
         <h1 className={styles.heroTitle}>
           The UK&apos;s Smartest Guide to{' '}
-          <em>Building Your Money Stack 1979</em>
+          <em>Building Your Money Stack</em>
         </h1>
 
         <p className={styles.heroSub}>
