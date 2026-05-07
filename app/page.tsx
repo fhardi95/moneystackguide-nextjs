@@ -60,7 +60,7 @@ export default function HomePage() {
           <Link href="/category/credit-cards" className="btn-primary">
             Browse All Guides
           </Link>
-          <Link href="/article/best-credit-cards-uk-2026" className="btn-outline">
+          <Link href="/article/best-credit-cards-uk" className="btn-outline">
             Best Credit Cards 2026 →
           </Link>
         </nav>
