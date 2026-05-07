@@ -7,9 +7,9 @@ import Newsletter from '@/components/Newsletter'
 import styles from './page.module.css'
 
 export const metadata: Metadata = {
-  title: 'Best Credit Cards Uk 2026 — MoneyStack Guide',
+  title: 'Best Credit Cards 2026 — MoneyStack Guide | Finance Guides',
   description:
-    'Find the best credit cards in the UK for 2026. Compare cashback, 0% balance transfer and savings accounts — MoneyStack updated monthly.',
+    'Find the best credit cards in the UK for 2026. Compare cashback, 0% balance transfer and savings accounts — MoneyStack Guide updated monthly.',
   alternates: {
     canonical: 'https://www.moneystackguide.com',
   },
