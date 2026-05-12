@@ -80,8 +80,8 @@ export default async function ArticlePage({ params }: PageProps) {
       url: 'https://www.moneystackguide.com',
     },
     publisher: {
-      '@type': 'Organization',
-      name: 'Money Stack Guide',
+      '@type': 'Person',
+      name: 'James Carter',
       url: 'https://www.moneystackguide.com',
     },
     mainEntityOfPage: {
