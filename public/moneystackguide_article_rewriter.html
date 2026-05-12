@@ -1,0 +1,309 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0f1117; color: #e2e8f0; min-height: 100vh; padding: 20px; }
+  h1 { font-size: 1.3rem; font-weight: 700; color: #f0f6ff; margin-bottom: 4px; }
+  .subtitle { font-size: 0.8rem; color: #64748b; margin-bottom: 16px; }
+  .stats { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+  .stat { background: #1e2330; border: 1px solid #2d3548; border-radius: 8px; padding: 10px 16px; text-align: center; flex: 1; min-width: 80px; }
+  .stat-num { font-size: 1.4rem; font-weight: 700; }
+  .stat-label { font-size: 0.7rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
+  .green { color: #4ade80; }
+  .yellow { color: #fbbf24; }
+  .red { color: #f87171; }
+  .blue { color: #60a5fa; }
+  .controls { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  button { padding: 9px 18px; border: none; border-radius: 7px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+  #startBtn { background: #3b82f6; color: white; }
+  #startBtn:hover:not(:disabled) { background: #2563eb; }
+  #startBtn:disabled { background: #1e3a5f; color: #475569; cursor: not-allowed; }
+  #downloadBtn { background: #16a34a; color: white; }
+  #downloadBtn:hover:not(:disabled) { background: #15803d; }
+  #downloadBtn:disabled { background: #14532d; color: #475569; cursor: not-allowed; }
+  #pauseBtn { background: #d97706; color: white; }
+  #pauseBtn:hover { background: #b45309; }
+  .progress-bar-wrap { background: #1e2330; border-radius: 8px; height: 8px; margin-bottom: 16px; overflow: hidden; }
+  .progress-bar { height: 100%; background: linear-gradient(90deg, #3b82f6, #8b5cf6); border-radius: 8px; transition: width 0.5s; }
+  .log { background: #0a0d14; border: 1px solid #1e2330; border-radius: 10px; height: 220px; overflow-y: auto; padding: 12px; font-family: 'Courier New', monospace; font-size: 0.72rem; }
+  .log-entry { padding: 2px 0; border-bottom: 1px solid #0f1520; }
+  .log-entry.ok { color: #4ade80; }
+  .log-entry.err { color: #f87171; }
+  .log-entry.info { color: #94a3b8; }
+  .log-entry.warn { color: #fbbf24; }
+  .articles-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 6px; margin-top: 12px; max-height: 220px; overflow-y: auto; }
+  .article-chip { background: #1e2330; border: 1px solid #2d3548; border-radius: 6px; padding: 6px 8px; font-size: 0.65rem; display: flex; align-items: center; gap: 5px; }
+  .chip-icon { font-size: 0.9rem; flex-shrink: 0; }
+  .chip-slug { color: #94a3b8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+  .chip-status { flex-shrink: 0; font-size: 0.75rem; }
+  .status-pending { color: #475569; }
+  .status-running { color: #fbbf24; animation: pulse 1s infinite; }
+  .status-done { color: #4ade80; }
+  .status-error { color: #f87171; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+  .section-title { font-size: 0.75rem; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; margin-top: 12px; }
+</style>
+</head>
+<body>
+
+<h1>🚀 MoneyStackGuide — Article Rewriter</h1>
+<p class="subtitle">Rewrites all 46 articles via Claude API → generates complete articles.ts</p>
+
+<div class="stats">
+  <div class="stat"><div class="stat-num blue" id="totalCount">46</div><div class="stat-label">Total</div></div>
+  <div class="stat"><div class="stat-num green" id="doneCount">0</div><div class="stat-label">Done</div></div>
+  <div class="stat"><div class="stat-num yellow" id="runningCount">0</div><div class="stat-label">Running</div></div>
+  <div class="stat"><div class="stat-num red" id="errorCount">0</div><div class="stat-label">Errors</div></div>
+  <div class="stat"><div class="stat-num" id="etaText">—</div><div class="stat-label">ETA</div></div>
+</div>
+
+<div class="progress-bar-wrap"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
+
+<div class="controls">
+  <button id="startBtn" onclick="startRewrite()">▶ Start Rewriting All 46</button>
+  <button id="pauseBtn" onclick="togglePause()" style="display:none">⏸ Pause</button>
+  <button id="downloadBtn" onclick="downloadFile()" disabled>⬇ Download articles.ts</button>
+</div>
+
+<div class="section-title">Live Log</div>
+<div class="log" id="log"></div>
+
+<div class="section-title">Articles</div>
+<div class="articles-grid" id="grid"></div>
+
+<script>
+const ARTICLES = [{"slug":"best-credit-cards-uk","title":"Best Credit Cards UK 2026 — 0% Interest, Cashback and Rewards Compared","excerpt":"We analysed 40+ UK credit cards across cashback, travel rewards, 0% purchase periods and credit building to find the best options for every wallet type in 2026.","category":"credit-cards","categoryName":"Credit Cards","readTime":"8 min read","date":"April 12, 2026","featured":true,"icon":"💳","gradient":"linear-gradient(135deg,#1a1224,#2a1040)","metaDescription":"Compare the best UK credit cards of 2026. Find the top cashback, 0% purchase, balance transfer and rewards cards — expert-reviewed and updated monthly."},{"slug":"best-cashback-credit-cards-uk","title":"Best Cashback Credit Cards UK 2026 — Earn Money on Every Purchase","excerpt":"The right cashback credit card can put hundreds of pounds back in your pocket every year. We compare every major cashback card in the UK to find the best deals.","category":"credit-cards","categoryName":"Credit Cards","readTime":"7 min read","date":"April 15, 2026","featured":false,"icon":"💳","gradient":"linear-gradient(135deg,#1a1224,#2a1040)","metaDescription":"Best cashback credit cards UK 2026. Compare Amex, Chase, Santander and more — find the highest cashback rates and which card suits your spending habits."},{"slug":"best-credit-cards-bad-credit-uk","title":"Best Credit Cards for Bad Credit UK 2026 — Rebuild Your Score","excerpt":"A poor credit history does not mean you cannot get a credit card. These specialist cards are designed to help you rebuild your credit score safely and affordably.","category":"credit-cards","categoryName":"Credit Cards","readTime":"6 min read","date":"April 10, 2026","featured":false,"icon":"💳","gradient":"linear-gradient(135deg,#1a1224,#2a1040)","metaDescription":"Best UK credit cards for bad credit 2026. Compare credit builder cards from Capital One, Aqua, Vanquis and Tesco — rebuild your credit score step by step."},{"slug":"best-travel-credit-cards-uk","title":"Best Travel Credit Cards UK 2026 — No Foreign Fees and Rewards","excerpt":"Using the wrong card abroad can cost you 3% on every transaction. These travel credit cards offer zero foreign transaction fees and earn rewards on every trip.","category":"credit-cards","categoryName":"Credit Cards","readTime":"7 min read","date":"April 8, 2026","featured":false,"icon":"✈️","gradient":"linear-gradient(135deg,#0d1a2a,#0a2540)","metaDescription":"Best travel credit cards UK 2026. Compare cards with no foreign transaction fees, travel rewards and airport lounge access — never pay extra abroad again."},{"slug":"best-student-loans-uk","title":"Best Student Loans UK 2026 — Plan 2 vs Plan 5, Repayment and What You Actually Owe","excerpt":"Everything UK students need to know about student loans in 2026 — repayment thresholds, interest rates, and whether paying it off early ever makes sense.","category":"student-loans","categoryName":"Student Loans","readTime":"6 min read","date":"April 8, 2026","featured":true,"icon":"🎓","gradient":"linear-gradient(135deg,#0d1a2a,#102840)","metaDescription":"Full guide to UK student loans in 2026. Compare Plan 2 and Plan 5 repayment, understand what you really owe, and find out if early repayment is worth it."},{"slug":"student-loan-repayment-calculator-guide","title":"UK Student Loan Repayment Calculator — How Much Will You Actually Pay Back?","excerpt":"Most graduates will never fully repay their student loan. Find out exactly how much you are likely to repay based on your salary, and whether it ever makes sense to overpay.","category":"student-loans","categoryName":"Student Loans","readTime":"8 min read","date":"April 14, 2026","featured":false,"icon":"🎓","gradient":"linear-gradient(135deg,#0d1a2a,#102840)","metaDescription":"UK student loan repayment calculator guide 2026. How much will you repay based on your salary, which plan you are on, and whether overpaying makes sense."},{"slug":"student-budgeting-tips-uk-university","title":"Student Budgeting Tips UK 2026 — Make Your Maintenance Loan Last the Term","excerpt":"Running out of money before the end of term is stressful. These proven budgeting strategies will help your money go further throughout the academic year.","category":"student-loans","categoryName":"Student Loans","readTime":"6 min read","date":"April 6, 2026","featured":false,"icon":"📚","gradient":"linear-gradient(135deg,#0d1a2a,#102840)","metaDescription":"Student budgeting tips UK 2026. How to make your maintenance loan last the full term — practical money advice for university students."},{"slug":"how-to-start-investing-500-pounds","title":"How to Start Investing with £500 in the UK — The Beginner Roadmap","excerpt":"You do not need thousands to start investing. Here is a practical step-by-step guide for UK beginners to put their first £500 to work safely and wisely.","category":"investing","categoryName":"Investing","readTime":"7 min read","date":"April 5, 2026","featured":false,"icon":"📈","gradient":"linear-gradient(135deg,#0a1f0a,#153015)","metaDescription":"Step-by-step guide to investing your first £500 in the UK. ISAs, index funds, platforms compared — everything a beginner needs to start investing confidently."},{"slug":"best-stocks-shares-isa-uk","title":"Best Stocks and Shares ISA UK 2026 — Platforms Compared for Every Budget","excerpt":"A Stocks and Shares ISA is the most tax-efficient way to invest in the UK. We compare every major platform on fees, fund range and ease of use to find the best for you.","category":"investing","categoryName":"Investing","readTime":"9 min read","date":"April 16, 2026","featured":false,"icon":"📊","gradient":"linear-gradient(135deg,#0a1f0a,#153015)","metaDescription":"Best Stocks and Shares ISA UK 2026. Compare Vanguard, Freetrade, Hargreaves Lansdown, InvestEngine — find the cheapest platform for your portfolio size."},{"slug":"index-funds-explained-uk-beginners","title":"Index Funds Explained UK — The Beginner Complete Guide for 2026","excerpt":"Index funds are the simplest, cheapest and most effective way for most people to invest. This guide explains what they are, how they work, and how to buy them in the UK.","category":"investing","categoryName":"Investing","readTime":"8 min read","date":"April 11, 2026","featured":false,"icon":"📈","gradient":"linear-gradient(135deg,#0a1f0a,#153015)","metaDescription":"Index funds explained for UK beginners 2026. What they are, how they work, which ones to buy and how to get started — a complete no-jargon guide."},{"slug":"pension-vs-isa-which-is-better-uk","title":"Pension vs ISA UK 2026 — Which Is Better for Your Retirement Savings?","excerpt":"Pension or ISA — both offer tax advantages but work very differently. Find out which is right for your situation and how to use both together effectively.","category":"investing","categoryName":"Investing","readTime":"8 min read","date":"April 18, 2026","featured":false,"icon":"🎯","gradient":"linear-gradient(135deg,#0a1f0a,#153015)","metaDescription":"Pension vs ISA UK 2026. Which is better for retirement saving? Compare tax relief, flexibility and returns to find the right strategy for your situation."},{"slug":"first-time-buyer-mortgage-guide-uk","title":"First-Time Buyer Mortgage Guide UK 2026 — Deposits, Schemes and Getting Approved","excerpt":"Everything you need to know about getting your first mortgage in the UK — from saving your deposit to getting the keys, including all government schemes available.","category":"mortgages","categoryName":"Mortgages","readTime":"10 min read","date":"March 28, 2026","featured":false,"icon":"🏠","gradient":"linear-gradient(135deg,#1f0a0a,#2e1010)","metaDescription":"Complete first-time buyer mortgage guide UK 2026. Deposits, Lifetime ISA, Shared Ownership, mortgage types and how to get approved — everything in one place."},{"slug":"fixed-vs-variable-rate-mortgage-uk","title":"Fixed vs Variable Rate Mortgage UK 2026 — Which Should You Choose?","excerpt":"One of the biggest decisions in any mortgage is whether to fix your rate or go variable. We break down the pros, cons and current rates to help you decide.","category":"mortgages","categoryName":"Mortgages","readTime":"7 min read","date":"April 2, 2026","featured":false,"icon":"🏠","gradient":"linear-gradient(135deg,#1f0a0a,#2e1010)","metaDescription":"Fixed vs variable rate mortgage UK 2026. Understand the difference, compare current rates, and find out which type of mortgage is right for your situation."},{"slug":"how-to-remortgage-uk-guide","title":"How to Remortgage UK 2026 — Save Thousands by Switching at the Right Time","excerpt":"Remortgaging at the right time is one of the best money moves a homeowner can make. This guide explains exactly when and how to remortgage to get the best possible rate.","category":"mortgages","categoryName":"Mortgages","readTime":"8 min read","date":"March 22, 2026","featured":false,"icon":"🏡","gradient":"linear-gradient(135deg,#1f0a0a,#2e1010)","metaDescription":"How to remortgage UK 2026. When to remortgage, how to find the best rates, what documents you need, and how much you could save — complete step-by-step guide."},{"slug":"50-30-20-budget-rule-explained","title":"The 50/30/20 Budget Rule Explained — Does It Work in 2026?","excerpt":"The 50/30/20 rule is one of the most popular budgeting frameworks. We break it down, show you how to apply it, and explain where it falls short for UK households.","category":"budgeting","categoryName":"Budgeting","readTime":"5 min read","date":"April 1, 2026","featured":false,"icon":"📋","gradient":"linear-gradient(135deg,#1f1a0a,#2e2810)","metaDescription":"The 50/30/20 budgeting rule explained for UK readers in 2026. Allocate your income across needs, wants and savings with practical UK examples."},{"slug":"how-to-save-money-fast-uk","title":"How to Save Money Fast UK 2026 — 25 Proven Ways to Cut Your Monthly Bills","excerpt":"Whether you are saving for a deposit, building an emergency fund, or stretching your salary further, these 25 practical tips will make a real difference.","category":"budgeting","categoryName":"Budgeting","readTime":"9 min read","date":"April 13, 2026","featured":false,"icon":"💰","gradient":"linear-gradient(135deg,#1f1a0a,#2e2810)","metaDescription":"How to save money fast UK 2026. 25 proven ways to cut bills, reduce spending and save hundreds of pounds per month — practical tips that actually work."},{"slug":"emergency-fund-guide-uk","title":"Emergency Fund UK — How Much Do You Really Need and Where to Keep It?","excerpt":"An emergency fund is the foundation of any solid financial plan. Find out exactly how much to save, where to keep it, and how to build it even on a tight budget.","category":"budgeting","categoryName":"Budgeting","readTime":"6 min read","date":"April 9, 2026","featured":false,"icon":"🛡️","gradient":"linear-gradient(135deg,#1f1a0a,#2e2810)","metaDescription":"Emergency fund guide UK 2026. How much do you need, where to keep it, and how to build one fast — everything you need to know about financial safety nets."},{"slug":"how-to-pay-off-debt-fast-uk","title":"How to Pay Off Debt Fast UK 2026 — Avalanche vs Snowball Methods Compared","excerpt":"Being in debt is stressful but there is a clear path out. We explain the two most effective debt repayment strategies and show which one saves the most money.","category":"budgeting","categoryName":"Budgeting","readTime":"7 min read","date":"April 17, 2026","featured":false,"icon":"❄️","gradient":"linear-gradient(135deg,#1f1a0a,#2e2810)","metaDescription":"How to pay off debt fast UK 2026. Debt avalanche vs snowball compared — which strategy saves you the most money and gets you debt-free fastest."},{"slug":"best-savings-accounts-uk-5-percent","title":"Best Easy-Access Savings Accounts with Rates Above 5% in 2026","excerpt":"Interest rates are still high. We round up the best easy-access savings accounts paying above 5% so your cash works as hard as possible while remaining accessible.","category":"savings","categoryName":"Savings","readTime":"4 min read","date":"March 25, 2026","featured":false,"icon":"🏦","gradient":"linear-gradient(135deg,#0a1f1f,#0d2e2e)","metaDescription":"Best UK savings accounts paying above 5% in 2026. Compare easy-access rates from high street banks and challenger banks — updated monthly."},{"slug":"lifetime-isa-guide-uk","title":"Lifetime ISA UK Guide 2026 — The 25% Government Bonus Explained","excerpt":"The Lifetime ISA is one of the best financial products available to under-40s. A 25% government bonus on every pound you save is too good to ignore.","category":"savings","categoryName":"Savings","readTime":"7 min read","date":"April 7, 2026","featured":false,"icon":"🏦","gradient":"linear-gradient(135deg,#0a1f1f,#0d2e2e)","metaDescription":"Lifetime ISA guide UK 2026. How the 25% government bonus works, who can open one, the property price cap, withdrawal penalties and best LISA providers compared."},{"slug":"stocks-shares-isa-vs-cash-isa","title":"Stocks and Shares ISA vs Cash ISA — Which Is Right for You in 2026?","excerpt":"Both ISA types protect your money from tax, but which should you choose? We compare returns, risk and who each type suits best with real numbers.","category":"savings","categoryName":"Savings","readTime":"6 min read","date":"March 20, 2026","featured":false,"icon":"📊","gradient":"linear-gradient(135deg,#0a1f1f,#0d2e2e)","metaDescription":"Stocks and Shares ISA vs Cash ISA UK 2026. Which gives better returns? Who should choose each? Expert comparison with real numbers and platform recommendations."},{"slug":"best-junior-isa-uk","title":"Best Junior ISA UK 2026 — Save Tax-Free for Your Child Future","excerpt":"A Junior ISA is one of the most powerful ways to build wealth for your child. We compare the best cash and stocks and shares junior ISAs available in 2026.","category":"savings","categoryName":"Savings","readTime":"6 min read","date":"April 3, 2026","featured":false,"icon":"👶","gradient":"linear-gradient(135deg,#0a1f1f,#0d2e2e)","metaDescription":"Best Junior ISA UK 2026. Compare cash and stocks and shares JISAs, the £9,000 annual limit, and find the best providers for your child."},{"slug":"best-rewards-credit-cards-uk","title":"Best Rewards Credit Cards UK 2026","excerpt":"Earn points, miles and cashback on every purchase. We compare the top rewards credit cards in the UK for maximum value from everyday spending.","category":"credit-cards","categoryName":"Credit Cards","readTime":"7 min read","date":"April 20, 2026","featured":false,"icon":"🎁","gradient":"linear-gradient(135deg,#1a1224,#2a1040)","metaDescription":"Best rewards credit cards UK 2026. Earn Avios, Virgin Points and cashback on everyday spending. Compare top UK rewards cards with honest expert reviews."},{"slug":"credit-card-eligibility-checker-uk","title":"Credit Card Eligibility Checker UK 2026","excerpt":"A soft eligibility check tells you your approval odds for any credit card without leaving a mark on your credit file. Here is how to use them and which tools are best.","category":"credit-cards","categoryName":"Credit Cards","readTime":"5 min read","date":"April 18, 2026","featured":false,"icon":"🔍","gradient":"linear-gradient(135deg,#1a1224,#2a1040)","metaDescription":"Credit card eligibility checker UK 2026. Use free soft search tools to see which cards you will be accepted for without damaging your credit score."},{"slug":"how-to-improve-credit-score-uk","title":"How to Improve Your Credit Score UK 2026","excerpt":"A better credit score unlocks better interest rates, higher credit limits and easier mortgage approvals. These proven steps raise your score faster than most people expect.","category":"credit-cards","categoryName":"Credit Cards","readTime":"8 min read","date":"April 16, 2026","featured":false,"icon":"📊","gradient":"linear-gradient(135deg,#1a1224,#2a1040)","metaDescription":"How to improve your credit score UK 2026. Proven steps from electoral roll registration to credit utilisation — raise your Experian and Equifax score fast."},{"slug":"best-0-percent-purchase-credit-cards-uk","title":"Best 0% Purchase Credit Cards UK 2026","excerpt":"Spread the cost of big purchases over months without paying a penny in interest. We compare every 0% purchase credit card available in the UK right now.","category":"credit-cards","categoryName":"Credit Cards","readTime":"6 min read","date":"April 14, 2026","featured":false,"icon":"💳","gradient":"linear-gradient(135deg,#1a1224,#2a1040)","metaDescription":"Best 0% purchase credit cards UK 2026. Spread big costs interest-free for up to 26 months. Compare the longest 0% purchase deals and avoid the common traps."},{"slug":"postgraduate-loan-uk-guide","title":"Postgraduate Loan UK 2026 — Masters and PhD Funding","excerpt":"The Postgraduate Masters Loan offers up to £13,348 and the Doctoral Loan up to £29,390. Here is everything you need to know about eligibility, repayment and whether it is worth taking.","category":"student-loans","categoryName":"Student Loans","readTime":"7 min read","date":"April 19, 2026","featured":false,"icon":"🎓","gradient":"linear-gradient(135deg,#0d1a2a,#102840)","metaDescription":"Postgraduate loan UK 2026. Masters and Doctoral loan amounts, repayment threshold of £21,000, interest rates and whether a postgraduate loan is worth taking."},{"slug":"student-finance-application-guide-uk","title":"Student Finance Application UK 2026 — Step by Step","excerpt":"Applying for student finance can be confusing the first time. This complete step-by-step guide walks you through the entire process so you get the right amount paid on time.","category":"student-loans","categoryName":"Student Loans","readTime":"6 min read","date":"April 17, 2026","featured":false,"icon":"📝","gradient":"linear-gradient(135deg,#0d1a2a,#102840)","metaDescription":"How to apply for student finance UK 2026. Step-by-step guide covering tuition fee loans, maintenance loans, deadlines and documents needed to apply correctly."},{"slug":"part-time-work-university-uk-guide","title":"Part-Time Work at University UK 2026 — Earn Without Hurting Your Degree","excerpt":"Working part-time alongside your studies reduces loan debt and builds your CV. Find out how much you can earn, which jobs work best and how to protect your grades.","category":"student-loans","categoryName":"Student Loans","readTime":"5 min read","date":"April 15, 2026","featured":false,"icon":"💼","gradient":"linear-gradient(135deg,#0d1a2a,#102840)","metaDescription":"Part-time work at university UK 2026. How much you can earn without affecting student finance, the best student jobs and how to balance work with your degree."},{"slug":"student-loan-vs-bank-loan-uk","title":"Student Loan vs Bank Loan UK — Which Is Better in 2026?","excerpt":"Should you fund your studies with a government student loan or a private bank loan? The differences in repayment protection and interest are enormous. Here is an honest comparison.","category":"student-loans","categoryName":"Student Loans","readTime":"6 min read","date":"April 13, 2026","featured":false,"icon":"🏦","gradient":"linear-gradient(135deg,#0d1a2a,#102840)","metaDescription":"Student loan vs bank loan UK 2026. Key differences in repayment protection, interest rates and risk — government loans almost always win for UK students."},{"slug":"how-to-invest-in-etfs-uk-beginners","title":"How to Invest in ETFs UK — Beginner Guide 2026","excerpt":"ETFs are the most popular investment vehicle for ordinary investors. Low cost, highly diversified and easy to buy in an ISA — everything a UK beginner needs to know to get started.","category":"investing","categoryName":"Investing","readTime":"8 min read","date":"April 20, 2026","featured":false,"icon":"📈","gradient":"linear-gradient(135deg,#0a1f0a,#153015)","metaDescription":"How to invest in ETFs UK 2026. What ETFs are, how to buy them inside an ISA, the best platforms and which funds to start with — complete beginner guide."},{"slug":"dividend-investing-uk-guide","title":"Dividend Investing UK — Build Passive Income in 2026","excerpt":"Dividend investing means building a portfolio that pays you regular income. Here is how to find reliable dividend stocks and funds and how much income you can realistically expect.","category":"investing","categoryName":"Investing","readTime":"9 min read","date":"April 18, 2026","featured":false,"icon":"💷","gradient":"linear-gradient(135deg,#0a1f0a,#153015)","metaDescription":"Dividend investing UK 2026. Build passive income from dividend stocks and funds — yields, tax treatment inside an ISA, and the best income ETFs for UK investors."},{"slug":"how-to-open-sipp-uk","title":"How to Open a SIPP UK 2026 — Self-Invested Pension Guide","excerpt":"A SIPP gives you full control over where your retirement money is invested, plus powerful government tax relief. Here is how to open one and what to invest in.","category":"investing","categoryName":"Investing","readTime":"8 min read","date":"April 16, 2026","featured":false,"icon":"🏦","gradient":"linear-gradient(135deg,#0a1f0a,#153015)","metaDescription":"How to open a SIPP UK 2026. Tax relief explained, contribution limits, best SIPP providers compared and what to invest in for retirement savings."},{"slug":"robo-advisors-uk-compared","title":"Best Robo-Advisors UK 2026 — Hands-Off Investing Compared","excerpt":"Robo-advisors manage your investments automatically based on your risk profile. We compare every major UK robo-advisor on fees, features and suitability.","category":"investing","categoryName":"Investing","readTime":"7 min read","date":"April 14, 2026","featured":false,"icon":"🤖","gradient":"linear-gradient(135deg,#0a1f0a,#153015)","metaDescription":"Best robo-advisors UK 2026. Compare Nutmeg, Wealthify, Moneybox and Moneyfarm on fees, returns and features — find the best hands-off investment platform."},{"slug":"how-much-can-i-borrow-mortgage-uk","title":"How Much Can I Borrow for a Mortgage UK 2026?","excerpt":"Mortgage lenders use income multiples and affordability tests to decide how much you can borrow. Find out what to expect and how to maximise your borrowing potential.","category":"mortgages","categoryName":"Mortgages","readTime":"7 min read","date":"April 20, 2026","featured":false,"icon":"🏠","gradient":"linear-gradient(135deg,#1f0a0a,#2e1010)","metaDescription":"How much can I borrow for a mortgage UK 2026? Income multiples, affordability tests and salary examples — find out your likely maximum mortgage before you start house hunting."},{"slug":"buy-to-let-mortgage-uk-guide","title":"Buy-to-Let Mortgage UK 2026 — Is It Still Worth It?","excerpt":"Buy-to-let can generate rental income and capital growth, but tax changes and higher deposit requirements have made the maths much harder. Here is the honest picture for 2026.","category":"mortgages","categoryName":"Mortgages","readTime":"10 min read","date":"April 18, 2026","featured":false,"icon":"🏡","gradient":"linear-gradient(135deg,#1f0a0a,#2e1010)","metaDescription":"Buy-to-let mortgage UK 2026. How BTL mortgages work, 25% deposit requirements, rental yield calculations, tax changes and whether buy-to-let still makes sense."},{"slug":"mortgage-overpayment-guide-uk","title":"Mortgage Overpayments UK 2026 — How Much Could You Save?","excerpt":"Overpaying your mortgage by even a small amount each month can save thousands in interest and shave years off your loan. Here is exactly how it works and whether it is worth doing.","category":"mortgages","categoryName":"Mortgages","readTime":"6 min read","date":"April 15, 2026","featured":false,"icon":"🏠","gradient":"linear-gradient(135deg,#1f0a0a,#2e1010)","metaDescription":"Mortgage overpayment UK 2026. How much could you save by overpaying each month? The 10% rule, early repayment charges and whether overpaying beats investing explained."},{"slug":"shared-ownership-uk-guide","title":"Shared Ownership UK 2026 — How It Works and Is It Worth It?","excerpt":"Shared Ownership lets you buy a percentage of a property and pay rent on the rest. It can make homeownership achievable, but the real costs and restrictions are widely misunderstood.","category":"mortgages","categoryName":"Mortgages","readTime":"8 min read","date":"April 12, 2026","featured":false,"icon":"🏘️","gradient":"linear-gradient(135deg,#1f0a0a,#2e1010)","metaDescription":"Shared Ownership UK guide 2026. How it works, real total costs, staircasing explained, pros and cons — is Shared Ownership worth it versus renting or buying outright?"},{"slug":"zero-based-budgeting-uk-guide","title":"Zero-Based Budgeting UK — Give Every Pound a Job","excerpt":"Zero-based budgeting is the most effective system for taking complete control of your money. Here is how to set it up in the UK and actually stick to it.","category":"budgeting","categoryName":"Budgeting","readTime":"7 min read","date":"April 20, 2026","featured":false,"icon":"🎯","gradient":"linear-gradient(135deg,#1f1a0a,#2e2810)","metaDescription":"Zero-based budgeting UK 2026. How to give every pound a job and take complete control of your finances — practical setup guide for UK households."},{"slug":"sinking-funds-uk-guide","title":"Sinking Funds UK 2026 — Never Be Caught Out By a Big Bill","excerpt":"A sinking fund is money set aside each month for a known future expense. Used correctly, sinking funds eliminate financial surprises and make your budget unshakeable.","category":"budgeting","categoryName":"Budgeting","readTime":"5 min read","date":"April 18, 2026","featured":false,"icon":"🪣","gradient":"linear-gradient(135deg,#1f1a0a,#2e2810)","metaDescription":"Sinking funds UK guide 2026. Set up sinking funds for car insurance, holidays, Christmas and home repairs so large bills never catch you off-guard again."},{"slug":"how-to-budget-as-a-couple-uk","title":"How to Budget as a Couple UK 2026 — Money and Relationships","excerpt":"Money is one of the top causes of relationship stress. These practical strategies for budgeting as a couple will keep finances clear, fair and conflict-free.","category":"budgeting","categoryName":"Budgeting","readTime":"8 min read","date":"April 16, 2026","featured":false,"icon":"💑","gradient":"linear-gradient(135deg,#1f1a0a,#2e2810)","metaDescription":"How to budget as a couple UK 2026. Joint accounts vs separate finances, the proportional income method and how to have productive money conversations with your partner."},{"slug":"frugal-living-uk-tips","title":"Frugal Living UK 2026 — 30 Ways to Cut Costs Without Feeling Deprived","excerpt":"Frugal living is about getting maximum value from every pound. These 30 practical UK money-saving tips reduce outgoings without reducing quality of life.","category":"budgeting","categoryName":"Budgeting","readTime":"10 min read","date":"April 14, 2026","featured":false,"icon":"🌱","gradient":"linear-gradient(135deg,#1f1a0a,#2e2810)","metaDescription":"Frugal living UK 2026. 30 practical ways to cut costs without feeling deprived — switching supermarkets, cutting energy bills and reducing lifestyle inflation."},{"slug":"best-fixed-rate-bonds-uk","title":"Best Fixed-Rate Bonds UK 2026 — Lock In High Returns","excerpt":"Fixed-rate bonds pay higher interest than easy-access accounts in exchange for locking money away for a set period. We compare the best rates available right now.","category":"savings","categoryName":"Savings","readTime":"6 min read","date":"April 20, 2026","featured":false,"icon":"🔒","gradient":"linear-gradient(135deg,#0a1f1f,#0d2e2e)","metaDescription":"Best fixed-rate bonds UK 2026. Compare 1, 2 and 3-year bond rates from challenger banks and building societies — lock in competitive returns before interest rates fall."},{"slug":"help-to-save-scheme-uk-guide","title":"Help to Save UK 2026 — The 50% Government Bonus Explained","excerpt":"The Help to Save account pays a 50% government bonus on your savings if you are on Universal Credit or Working Tax Credit. It is one of the best deals available to eligible savers.","category":"savings","categoryName":"Savings","readTime":"5 min read","date":"April 18, 2026","featured":false,"icon":"🆘","gradient":"linear-gradient(135deg,#0a1f1f,#0d2e2e)","metaDescription":"Help to Save UK 2026. How the 50% government bonus works, who qualifies, maximum bonus of £1,200 and how to open an account if you are on Universal Credit."},{"slug":"regular-savings-accounts-uk","title":"Best Regular Savings Accounts UK 2026 — Up to 7% AER","excerpt":"Regular savings accounts pay far higher rates than standard savings — some above 7% AER — in exchange for saving a set amount each month. Here are the best deals right now.","category":"savings","categoryName":"Savings","readTime":"6 min read","date":"April 16, 2026","featured":false,"icon":"📅","gradient":"linear-gradient(135deg,#0a1f1f,#0d2e2e)","metaDescription":"Best regular savings accounts UK 2026. Rates up to 7% AER — compare monthly deposit limits, withdrawal rules and which bank account you need to qualify."},{"slug":"premium-bonds-uk-guide","title":"Premium Bonds UK 2026 — Are They Worth It?","excerpt":"Premium Bonds are held by 22 million UK savers. But are they actually a good place for your money? The honest answer depends entirely on how much you have saved and your tax rate.","category":"savings","categoryName":"Savings","readTime":"7 min read","date":"April 14, 2026","featured":false,"icon":"🎰","gradient":"linear-gradient(135deg,#0a1f1f,#0d2e2e)","metaDescription":"Premium Bonds UK 2026. Are they worth it? How the 4.4% prize fund rate compares to savings accounts, who benefits most and when to choose Premium Bonds over a cash ISA."}];
+
+const byCategory = {};
+ARTICLES.forEach(a => {
+  if (!byCategory[a.category]) byCategory[a.category] = [];
+  byCategory[a.category].push(a);
+});
+
+const state = {
+  statuses: Object.fromEntries(ARTICLES.map(a => [a.slug, 'pending'])),
+  contents: {},
+  running: false,
+  paused: false,
+  startTime: null,
+  doneTimes: []
+};
+
+// Build grid
+const grid = document.getElementById('grid');
+ARTICLES.forEach(a => {
+  const chip = document.createElement('div');
+  chip.className = 'article-chip';
+  chip.id = 'chip-' + a.slug;
+  chip.innerHTML = `<span class="chip-icon">${a.icon}</span><span class="chip-slug" title="${a.slug}">${a.slug}</span><span class="chip-status status-pending" id="status-${a.slug}">○</span>`;
+  grid.appendChild(chip);
+});
+
+function log(msg, type='info') {
+  const el = document.getElementById('log');
+  const div = document.createElement('div');
+  div.className = 'log-entry ' + type;
+  div.textContent = new Date().toLocaleTimeString() + ' ' + msg;
+  el.appendChild(div);
+  el.scrollTop = el.scrollHeight;
+}
+
+function updateStats() {
+  const done = Object.values(state.statuses).filter(s => s === 'done').length;
+  const running = Object.values(state.statuses).filter(s => s === 'running').length;
+  const errors = Object.values(state.statuses).filter(s => s === 'error').length;
+  document.getElementById('doneCount').textContent = done;
+  document.getElementById('runningCount').textContent = running;
+  document.getElementById('errorCount').textContent = errors;
+  document.getElementById('progressBar').style.width = (done / ARTICLES.length * 100) + '%';
+  
+  if (done > 0 && state.startTime) {
+    const elapsed = (Date.now() - state.startTime) / 1000;
+    const perArticle = elapsed / done;
+    const remaining = (ARTICLES.length - done) * perArticle;
+    const mins = Math.floor(remaining / 60);
+    const secs = Math.floor(remaining % 60);
+    document.getElementById('etaText').textContent = done >= ARTICLES.length ? 'Done!' : `~${mins}m ${secs}s`;
+  }
+}
+
+function setChipStatus(slug, status) {
+  state.statuses[slug] = status;
+  const el = document.getElementById('status-' + slug);
+  if (!el) return;
+  const map = { pending: ['○', 'status-pending'], running: ['◉', 'status-running'], done: ['✓', 'status-done'], error: ['✗', 'status-error'] };
+  el.className = 'chip-status ' + map[status][1];
+  el.textContent = map[status][0];
+  updateStats();
+}
+
+function buildPrompt(article) {
+  const sameCat = byCategory[article.category]
+    .filter(a => a.slug !== article.slug)
+    .slice(0, 4)
+    .map(a => `[${a.title}](/article/${a.slug})`)
+    .join(', ');
+
+  const crossCat = ARTICLES
+    .filter(a => a.category !== article.category)
+    .slice(0, 3)
+    .map(a => `[${a.title}](/article/${a.slug})`)
+    .join(', ');
+
+  return `You are a senior UK personal finance writer for moneystackguide.com — a YMYL site. Write a COMPLETE, UNIQUE, expert-level article.
+
+Title: ${article.title}
+Category: ${article.categoryName}
+Meta description: ${article.metaDescription}
+
+MANDATORY REQUIREMENTS:
+1. Minimum 1,800 words of substantive, genuinely useful content
+2. British English throughout (£, colour, whilst, prioritise, etc.)
+3. Unique angle with specific UK data: real rates, thresholds, FCA rules, HMRC limits, gov schemes by exact name
+4. Minimum 7 ## sections, each with 3+ paragraphs
+5. At least one markdown comparison table
+6. At least one numbered practical checklist
+7. A "Quick Summary" box near the top (use > blockquote format)
+8. A "Common Mistakes to Avoid" section
+9. A "FAQs" section at the bottom (4 questions, detailed answers)
+10. Naturally embed these internal links in body text:
+    Same category: ${sameCat}
+    Cross-category: ${crossCat}
+11. End with a financial disclaimer paragraph
+12. DO NOT include the H1 title — start directly with ## first section
+13. Every section substantive — no padding or fluff
+
+Return ONLY the markdown content. No preamble, no explanation.`;
+}
+
+async function rewriteOne(article) {
+  setChipStatus(article.slug, 'running');
+  log(`→ Starting: ${article.slug}`, 'info');
+  
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 4000,
+        messages: [{ role: 'user', content: buildPrompt(article) }]
+      })
+    });
+    
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
+    
+    const content = data.content[0].text;
+    state.contents[article.slug] = content;
+    setChipStatus(article.slug, 'done');
+    log(`✓ Done: ${article.slug} (${content.length.toLocaleString()} chars)`, 'ok');
+    return true;
+  } catch (err) {
+    setChipStatus(article.slug, 'error');
+    log(`✗ Error: ${article.slug} — ${err.message}`, 'err');
+    return false;
+  }
+}
+
+function generateArticlesTS() {
+  const lines = [];
+  lines.push(`import type { Article, Category } from './types'`);
+  lines.push('');
+  lines.push('export const categories: Category[] = [');
+  lines.push(`  { slug: 'credit-cards', name: 'Credit Cards', icon: '💳', count: ${ARTICLES.filter(a=>a.category==='credit-cards').length} },`);
+  lines.push(`  { slug: 'student-loans', name: 'Student Loans', icon: '🎓', count: ${ARTICLES.filter(a=>a.category==='student-loans').length} },`);
+  lines.push(`  { slug: 'investing', name: 'Investing', icon: '📈', count: ${ARTICLES.filter(a=>a.category==='investing').length} },`);
+  lines.push(`  { slug: 'mortgages', name: 'Mortgages', icon: '🏠', count: ${ARTICLES.filter(a=>a.category==='mortgages').length} },`);
+  lines.push(`  { slug: 'budgeting', name: 'Budgeting', icon: '💰', count: ${ARTICLES.filter(a=>a.category==='budgeting').length} },`);
+  lines.push(`  { slug: 'savings', name: 'Savings', icon: '🏦', count: ${ARTICLES.filter(a=>a.category==='savings').length} },`);
+  lines.push('];');
+  lines.push('');
+  lines.push('export const articles: Article[] = [');
+  
+  for (const a of ARTICLES) {
+    const content = state.contents[a.slug] || '<!-- content not generated -->';
+    const escaped = content.replace(/`/g, '\\`').replace(/\${/g, '\\${');
+    lines.push('  {');
+    lines.push(`    slug: '${a.slug}',`);
+    lines.push(`    title: '${a.title.replace(/'/g, "\\'")}',`);
+    lines.push(`    excerpt: '${a.excerpt.replace(/'/g, "\\'")}',`);
+    lines.push(`    category: '${a.category}',`);
+    lines.push(`    categoryName: '${a.categoryName}',`);
+    lines.push(`    readTime: '${a.readTime}',`);
+    lines.push(`    date: '${a.date}',`);
+    if (a.featured) lines.push(`    featured: true,`);
+    lines.push(`    icon: '${a.icon}',`);
+    lines.push(`    gradient: '${a.gradient}',`);
+    lines.push(`    metaDescription: '${a.metaDescription.replace(/'/g, "\\'")}',`);
+    lines.push(`    content: \`${escaped}\`,`);
+    lines.push('  },');
+    lines.push('');
+  }
+  
+  lines.push('];');
+  lines.push('');
+  lines.push('export function getArticleBySlug(slug: string) {');
+  lines.push('  return articles.find(a => a.slug === slug) ?? null;');
+  lines.push('}');
+  lines.push('');
+  lines.push('export function getArticlesByCategory(category: string) {');
+  lines.push('  return articles.filter(a => a.category === category);');
+  lines.push('}');
+  lines.push('');
+  lines.push('export function getRecentArticles(count = 6) {');
+  lines.push('  return articles.slice(0, count);');
+  lines.push('}');
+  
+  return lines.join('\n');
+}
+
+function downloadFile() {
+  const ts = generateArticlesTS();
+  const blob = new Blob([ts], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'articles.ts';
+  a.click();
+  URL.revokeObjectURL(url);
+  log('📥 articles.ts downloaded!', 'ok');
+}
+
+let paused = false;
+function togglePause() {
+  paused = !paused;
+  document.getElementById('pauseBtn').textContent = paused ? '▶ Resume' : '⏸ Pause';
+  if (!paused) log('▶ Resumed', 'warn');
+  else log('⏸ Paused — will finish current article', 'warn');
+}
+
+async function startRewrite() {
+  document.getElementById('startBtn').disabled = true;
+  document.getElementById('pauseBtn').style.display = 'inline-block';
+  state.startTime = Date.now();
+  
+  const pending = ARTICLES.filter(a => state.statuses[a.slug] === 'pending');
+  log(`Starting rewrite of ${pending.length} articles...`, 'warn');
+  
+  for (let i = 0; i < pending.length; i++) {
+    while (paused) await new Promise(r => setTimeout(r, 500));
+    await rewriteOne(pending[i]);
+    await new Promise(r => setTimeout(r, 300));
+    
+    const done = Object.values(state.statuses).filter(s => s === 'done').length;
+    if (done === ARTICLES.length) break;
+  }
+  
+  const done = Object.values(state.statuses).filter(s => s === 'done').length;
+  const errors = Object.values(state.statuses).filter(s => s === 'error').length;
+  log(`🎉 Complete! ${done} done, ${errors} errors`, 'ok');
+  document.getElementById('downloadBtn').disabled = false;
+  document.getElementById('pauseBtn').style.display = 'none';
+  document.getElementById('etaText').textContent = 'Done!';
+}
+</script>
+</body>
+</html>
