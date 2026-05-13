@@ -33,7 +33,7 @@ export const articles: Article[] = [
 
   {
     slug: 'best-credit-cards-uk',
-    title: 'Best Credit Cards UK 2026 — 0% Interest, Cashback and Rewards Compared',
+    title: 'Best Credit Cards UK 2026 — 0% Interest, Rewards Compared',
     excerpt: 'We analysed 40+ UK credit cards across cashback, travel rewards, 0% purchase periods and credit building to find the best options for every wallet type in 2026.',
     category: 'credit-cards',
     categoryName: 'Credit Cards',
